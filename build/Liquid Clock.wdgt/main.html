@@ -1,0 +1,479 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <style type="text/css">
+    
+    	#clockBody
+    	{
+    	  background: url(background-gradient.png);
+    	  position: relative;
+    	  margin-left:10px;
+    	  margin-top: 20px;
+    	  height: 118px;
+    	  width: 370px;
+    	}
+    
+      #droplets
+      {
+        height: 90px;
+        margin-bottom: -50px;
+      }
+      
+      .dropGuide
+      {
+        position: absolute;
+        margin-left: 83px;
+        width: 3px;
+        height: 110px;
+      }
+      
+      #valves
+      {
+        height: 90px;
+        margin-bottom: -50px;
+      }
+      
+      .valveGuide
+      {
+        position: absolute;
+        margin-left: 82px;
+        width: 3px;
+        height: 110px;
+      }
+      
+      .funnel
+      {
+        position: relative;
+        width: 48px;
+        height: 63px;
+        margin-bottom: 20px;
+        padding-right: 10px;
+        float: left;
+      }
+    
+      .funnelGlass
+      {
+        background: url(glassFunnel.png);
+        width: 48px;
+        height: 63px;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+      }
+      
+      .funnelInsert
+      {
+        overflow: hidden;
+        width: 48px;
+        position: absolute;
+      }
+      
+      .gauge
+      {
+        text-align: right;
+        float: left;
+        font: 20px Lucida Sans Unicode, Lucida Grande;
+        height: 50px;
+        width: 40px;
+        padding-top: 18px;
+        padding-right: 20px;
+        margin-bottom: 20px;
+      }
+      
+      .valve
+      {
+        position: absolute;
+        left: -6px;
+        top: 60px;
+        background: url(spriteSheet.png) no-repeat scroll -76px -6px;
+        width: 15px;
+        height: 22px;
+
+      }
+      
+      .topValve
+      {
+        position: absolute;
+        left: -13px;
+        top: -7px;
+        background: url(spriteSheet.png) no-repeat scroll -90px -6px;
+        width: 20px;
+        height: 22px;
+      }
+      
+      #topPipe
+      {
+        width: 359px;
+        position: absolute;
+        left: 6px;
+        margin-top: -12px;
+        background: url(spriteSheet.png) no-repeat scroll -6px 0px;
+        height: 6px;
+      }
+      
+      #bottomPipe
+      {
+        width: 359px;
+        position: absolute;
+        left: 6px;
+        margin-top: 78px;
+        background: url(spriteSheet.png) no-repeat scroll -6px 0px;
+        height: 6px;
+      }
+      
+      #leftPipe
+      {
+        position: absolute;
+        background: url(spriteSheet.png) no-repeat scroll 0px 0px;
+        width: 6px;
+        top: -5px;
+        height: 122px;
+      }
+      
+      #rightPipe
+      {
+        position: absolute;
+        background: url(spriteSheet.png) no-repeat scroll 0px 0px;
+        width: 6px;
+        left: 364px;
+        top: -5px;
+        height: 121px;
+      }
+      
+      #upperLeftCorner
+      {
+        position: absolute;
+        top: -11px;
+        left: 0px;
+        background: url(spriteSheet.png) no-repeat scroll -56px -6px;
+        width: 8px;
+        height: 8px;
+      }
+      
+      #upperRightCorner
+      {
+        position: absolute;
+        top: -12px;
+        left: 362px;
+        background: url(spriteSheet.png) no-repeat scroll -69px -6px;
+        width: 8px;
+        height: 8px;
+      }
+      
+      #lowerRightCorner
+      {
+        position: absolute;
+        top: 116px;
+        left: 363px;
+        background: url(spriteSheet.png) no-repeat scroll -69px -19px;
+        width: 8px;
+        height: 8px;
+      }
+      
+      #lowerLeftCorner
+      {
+        position: absolute;
+        top: 117px;
+        left: 1px;
+        background: url(spriteSheet.png) no-repeat scroll -56px -19px;
+        width: 8px;
+        height: 8px;
+      }
+      
+      #minutesInsertImage
+      {
+        position: absolute;
+      }
+      
+      #secondsInsertImage
+      {
+        position: absolute;
+      }
+      
+      #hoursInsertImage
+      {
+        position: absolute;
+      }
+    	
+    </style>
+    <script type="text/javascript" src="jquery-1.3.2.min.js"></script>
+    <script type="text/javascript">
+    
+      var seconds;
+      var minutes;
+      var hours;
+      
+      var heightOfFunnel = 63;
+      var lengthOfStem = 30;
+      var heightOfBulb = 30;
+      
+      function adjustInsert(id, value, max)
+      {
+        if(value>=59)
+        {
+          return;
+        }
+        if(max==60)
+        {
+        	if(value < (max/8) )
+					{
+						$("#"+id).css('top', heightOfFunnel-(lengthOfStem/(max/8)*value));
+						$("#"+id).css('height', (lengthOfStem/(max/8)*value));
+						$("#"+id+"Image").css('top', -(heightOfBulb+(lengthOfStem/max/8)*value));
+					}
+					else
+					{
+						$("#"+id).css('top', heightOfFunnel - lengthOfStem - 15 * Math.log(value/8) );
+						$("#"+id).css('height', lengthOfStem + 15 * Math.log(value/8) ); 
+						$("#"+id+"Image").css('top', -heightOfFunnel + lengthOfStem + 15 * Math.log(value/8) );
+					}
+        }
+        else
+        {
+        	if(value < (max/4) )
+					{
+						$("#"+id).css('top', heightOfFunnel-(lengthOfStem/(max/4)*value));
+						$("#"+id).css('height', (lengthOfStem/(max/4)*value));
+						$("#"+id+"Image").css('top', -(heightOfBulb+(lengthOfStem/max/4)*value));
+					}
+					else
+					{
+						$("#"+id).css('top', heightOfFunnel - lengthOfStem - 27 * Math.log(value/4) );
+						$("#"+id).css('height', lengthOfStem + 27 * Math.log(value/4) ); 
+						$("#"+id+"Image").css('top', -heightOfFunnel + lengthOfStem + 27 * Math.log(value/4) );
+					}
+        }
+      }
+      
+      function dumpMinute()
+      {
+        $("#secondsInsertImage").animate({"top": -heightOfFunnel},650);
+        $("#secondsInsert").animate({"top": heightOfFunnel, "height": 0},650);
+      }
+      
+      function dumpHour()
+      {
+        $("#minutesInsert").animate({"top": heightOfFunnel, "height": 0},650);
+        $("#minutesInsertImage").animate({"top": -heightOfFunnel},650);
+      }
+      
+      function dumpHalfDay()
+      {
+        $("#hoursInsert").animate({"top": heightOfFunnel, "height": 0},650);
+        $("#hoursInsertImage").animate({"top": -heightOfFunnel},650);
+      }
+      
+      function updateTime()
+      {
+        var now = new Date();
+        seconds = now.getSeconds();
+        minutes = now.getMinutes();
+        hours = now.getHours() % 12;
+        
+        $('#secondsGauge').text(seconds);
+        $('#minutesGauge').text(minutes);
+        $('#hoursGauge').text(hours);
+        
+        adjustInsert("secondsInsert", seconds, 60);
+        adjustInsert("minutesInsert", minutes, 60);
+        adjustInsert("hoursInsert", hours, 12);
+				
+				setTimeout('$("#secondDroplet").css("top", "0px"); $("#secondDroplet").animate({"top": "100px"},300);',650);
+				
+				if(seconds==59)
+				{
+				  setTimeout('dumpMinute();', 200);
+				  setTimeout('$("#minuteDroplet").css("top", "0px"); $("#minuteDroplet").animate({"top": "100px"},300);',650);
+				 	if(minutes==59)
+					{
+					  setTimeout('dumpHour();', 200);
+						setTimeout('$("#hourDroplet").css("top", "0px"); $("#hourDroplet").animate({"top": "100px"},300);',650);
+						if(hours==12)
+						{
+						  setTimeout('dumpHalfDay();', 200);
+						}
+					}
+				}
+        
+        if(!widgetIsHidden)
+        {
+          setTimeout("updateTime()",1000);
+        }
+        
+
+      }
+    
+			jQuery(document).ready( function(){			
+				setTimeout("updateTime()",1000);
+			});
+			
+    </script>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" href="main.css">
+    <script type="text/javascript" src="file:///System/Library/WidgetResources/AppleClasses/AppleAnimator.js" charset="utf-8"></script>
+    <script type="text/javascript" src="file:///System/Library/WidgetResources/AppleClasses/AppleButton.js" charset="utf-8"></script>
+    <script type="text/javascript" src="file:///System/Library/WidgetResources/AppleClasses/AppleInfoButton.js" charset="utf-8"></script>
+    <script type="text/javascript" src="localizedStrings.js" charset="utf-8"></script>
+    <script type="text/javascript" src="Parts/utilities.js" charset="utf-8"></script>
+    <script type="text/javascript" src="Parts/setup.js" charset="utf-8"></script>
+    <script type="text/javascript" src="Parts/Text.js" charset="utf-8"></script>
+    <script type="text/javascript" src="Parts/InfoButton.js" charset="utf-8"></script>
+    <script type="text/javascript" src="Parts/GlassButton.js" charset="utf-8"></script>
+    <script type="text/javascript" src="main.js" charset="utf-8"></script>
+</head>
+<body onload="load();">
+    <div id="front">
+        <img id="frontImg" src="Images/front.png" alt="">
+        <div style="position: relative;">
+            <div id="clockBody">
+                <div id="leftPipe"></div>
+                <div id="droplets">
+                    <div class="dropGuide" id="hourDrop">
+                        <div id="hourDroplet" style="top: 99px; position: absolute; width: 3px; height: 5px; background-color: #EC4800"></div>
+                        <div class="topValve"></div>
+                    </div>
+                    <div class="dropGuide" id="minuteDrop" style="left: 118px;">
+                        <div id="minuteDroplet" style="top: 99px; position: absolute; width: 3px; height: 5px; background-color: #EF900F"></div>
+                        <div class="topValve"></div>
+                    </div>
+                    <div class="dropGuide" id="secondDrop" style="left: 236px;">
+                        <div id="secondDroplet" style="top: 99px; position: absolute; width: 3px; height: 5px; background-color: #F0C600"></div>
+                        <div class="topValve"></div>
+                    </div>
+                    <div id="topPipe"></div>
+                </div>
+                <div class="gauge" id="hoursGauge">
+                </div>
+                <div class="funnel">
+                    <div id="hoursInsert" class="funnelInsert">
+                        <img src="redInsert.png" id="hoursInsertImage">
+                    </div>
+                    <div class="funnelGlass"></div>
+                </div>
+                <div class="gauge" id="minutesGauge">
+                </div>
+                <div class="funnel">
+                    <div id="minutesInsert" class="funnelInsert">
+                        <img src="orangeInsert.png" id="minutesInsertImage">
+                    </div>
+                    <div class="funnelGlass"></div>
+                </div>
+                <div class="gauge" id="secondsGauge">
+                </div>
+                <div class="funnel">
+                    <div id="secondsInsert" class="funnelInsert">
+                        <img src="yellowInsert.png" id="secondsInsertImage">
+                    </div>
+                    <div class="funnelGlass"></div>
+                </div>
+                <div id="valves">
+                    <div class="valveGuide" id="hourDrop">
+                        <div class="valve"></div>
+                    </div>
+                    <div class="valveGuide" id="minuteDrop" style="left: 118px;">
+                        <div class="valve"></div>
+                    </div>
+                    <div class="valveGuide" id="secondDrop" style="left: 236px;">
+                        <div class="valve"></div>
+                    </div>
+                    <div id="bottomPipe"></div>
+                </div>
+                <div id="rightPipe"></div>
+                <div id="upperLeftCorner"></div>
+                <div id="upperRightCorner"></div>
+                <div id="lowerRightCorner"></div>
+                <div id="lowerLeftCorner"></div>
+                <div style="clear: both;"></div>
+            </div>
+        </div>
+        <div id="info"></div>
+    </div>
+    <div id="back">
+        <img id="backImg" src="Images/back.png" alt="">
+        <div id="done"></div>
+        <div id="glassbutton"></div>
+        <select id="popup" onchange="hourChangeHandler(event)">
+            <option value="redInsert.png,F00">Default</option>
+            <option value="blackInsert.png,000">India Ink</option>
+            <option value="whiteInsert.png,EDEDED">Fresh Milk</option>
+            <option value="pinkInsert.png,DD5D5D">Pink Lemonade</option>
+            <option value="redInsert.png,F00">Tomato Sauce</option>
+            <option value="orangeInsert.png,F30">Mango Juice</option>
+            <option value="yellowInsert.png,FF0">Lemon Cream</option>
+            <option value="greenInsert.png,0F0">Pea Soup</option>
+            <option value="blueInsert.png,00F">Blueberry Juice</option>
+            <option value="purpleInsert.png,F0F">Eggplant Puree</option>
+            <option value="clearInsert.png,BCBCBC">Clear Water</option>
+        </select>
+        <select id="popup1" onchange="minuteChangeHandler(event)">
+            <option value="orangeInsert.png,F30">Default</option>
+            <option value="blackInsert.png,000">India Ink</option>
+            <option value="whiteInsert.png,EDEDED">Fresh Milk</option>
+            <option value="pinkInsert.png,DD5D5D">Pink Lemonade</option>
+            <option value="redInsert.png,F00">Tomato Sauce</option>
+            <option value="orangeInsert.png,F30">Mango Juice</option>
+            <option value="yellowInsert.png,FF0">Lemon Cream</option>
+            <option value="greenInsert.png,0F0">Pea Soup</option>
+            <option value="blueInsert.png,00F">Blueberry Juice</option>
+            <option value="purpleInsert.png,F0F">Eggplant Puree</option>
+            <option value="clearInsert.png,BCBCBC">Clear Water</option>
+        </select>
+        <select id="popup2" onchange="secondChangeHandler(event)">
+            <option value="yellowInsert.png,DD0">Default</option>
+            <option value="blackInsert.png,000">India Ink</option>
+            <option value="whiteInsert.png,5D5D5D">Fresh Milk</option>
+            <option value="pinkInsert.png,DD5D5D">Pink Lemonade</option>
+            <option value="redInsert.png,F00">Tomato Sauce</option>
+            <option value="orangeInsert.png,F30">Mango Juice</option>
+            <option value="yellowInsert.png,DD0">Lemon Cream</option>
+            <option value="greenInsert.png,0F0">Pea Soup</option>
+            <option value="blueInsert.png,00F">Blueberry Juice</option>
+            <option value="purpleInsert.png,F0F">Eggplant Puree</option>
+            <option value="clearInsert.png,BCBCBC">Clear Water</option>
+        </select>
+        <script>
+        
+        var hourPreference;
+        hourPreference = widget.preferenceForKey(widget.identifier + "-hourColor");
+        if(hourPreference == undefined)
+        {
+          widget.setPreferenceForKey("yellowInsert.png,DD0", widget.identifier + "-hourColor");
+          hourPreference = "yellowInsert.png,DD0";
+        }
+        else
+        {
+          document.getElementById('hoursInsertImage').src = (hourPreference.split(','))[0];
+          document.getElementById('hourDroplet').style.backgroundColor = "#" + (hourPreference.split(','))[1];
+        }
+        
+        var minutePreference = widget.preferenceForKey(widget.identifier + "-minuteColor");
+        if(minutePreference==undefined)
+        {
+          widget.setPreferenceForKey("orangeInsert.png,F30", widget.identifier + "-minuteColor");
+        }
+        else
+        {
+          document.getElementById('minutesInsertImage').src = (minutePreference.split(','))[0];
+          document.getElementById('minuteDroplet').style.backgroundColor = "#" + (minutePreference.split(','))[1];
+        }
+    
+        var secondPreference = widget.preferenceForKey(widget.identifier + "-secondColor");
+        
+        if(secondPreference==undefined)
+        {
+          widget.setPreferenceForKey("redInsert.png,F00", widget.identifier + "-secondColor");
+        }
+        else
+        {
+          document.getElementById('secondsInsertImage').src = (secondPreference.split(','))[0];
+          document.getElementById('secondDroplet').style.backgroundColor = "#" + (secondPreference.split(','))[1];
+        }
+        
+        </script>
+        <div id="text"></div>
+        <div id="text1"></div>
+        <div id="text2"></div>
+        <div id="text3"></div>
+    </div>
+</body>
+</html>
